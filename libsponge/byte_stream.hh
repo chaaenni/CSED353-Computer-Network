@@ -19,11 +19,11 @@ class ByteStream {
     // that's a sign that you probably want to keep exploring
     // different approaches.
     deque<char> buffer;
-    int _capacity;
+    size_t _capacity;
     bool _input_ended;
     bool _error;  //!< Flag indicating that the stream suffered an error.
-    int _num_written; //total number of chars that are written into stream until now
-    int _num_read; //total number of chars that are read until now
+    size_t _num_written; //total number of chars that are written into stream until now
+    size_t _num_read; //total number of chars that are read until now
 
   public:
     //! Construct a stream with room for `capacity` bytes.
