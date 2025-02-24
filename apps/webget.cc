@@ -19,12 +19,20 @@ void get_URL(const string &host, const string &path) {
     TCPSocket socket1;
     socket1.connect(Address(host, "http"));
 
-    string req = "GET " + path + " " + "HTTP/1.1\r\n"
+    std::string req = "GET " + path + " " + "HTTP/1.1\r\n"
                  "Host: " + host + "\r\n"
                  "Connection: close\r\n";
-                 
+
     socket1.write(req);
 
+    std::string recvd;
+
+    while(!socket1.eof()){
+        recvd = socket1.read();
+        std::cout << recvd;
+    }
+
+    socket1.close();
 
     cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
     cerr << "Warning: get_URL() has not been implemented yet.\n";
