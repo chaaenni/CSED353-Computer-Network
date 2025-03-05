@@ -1,11 +1,11 @@
 Assignment 1 Writeup
 =============
 
-My name: [your name here]
+My name: [Chaeyeon Jang]
 
-My POVIS ID: [your povis id here]
+My POVIS ID: [jcy2749]
 
-My student ID (numeric): [your student id here]
+My student ID (numeric): [20200952]
 
 This assignment took me about [n] hours to do (including the time on studying, designing, and writing the code).
 
@@ -17,11 +17,3 @@ Implementation Challenges:
 
 Remaining Bugs:
 []
-
-- Optional: I had unexpected difficulty with: [describe]
-
-- Optional: I think you could make this assignment better by: [describe]
-
-- Optional: I was surprised by: [describe]
-
-- Optional: I'm not sure about: [describe]
