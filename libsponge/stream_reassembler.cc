@@ -25,22 +25,18 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         _if_eof = true;
     }
 
-    // if(index + data.size() <= _next_index){
-        
-    // }
-
+    // 1
     size_t start_index = index;
     string subdata = data;
     if(index < _next_index){
         start_index = _next_index;
-        subdata = data.substr(start_index - index);
+        if(subdata.size() > start_index - index) subdata = data.substr(start_index - index);
+        else subdata = "";
     }
 
-    // size_t start_index = index;
+    //2
     // string subdata = data;
-    // // if(index < _next_index){
-    // //     subdata = data.substr(_next_index - index);
-    // // }
+
 
     // for(size_t i = 0; i < subdata.length() ; i++){
     //     _unassembled[start_index + i] = subdata[i];
@@ -59,10 +55,12 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     size_t remaining_capacity = _capacity - _output.buffer_size();
     // size_t remaining_capacity = _capacity - _output.buffer_size() - _unassembled_bytes;
     // cout << "_unassembled_bytes: " << _unassembled_bytes << "capacity: " << _capacity << endl;
+
+    //1
     if (subdata.size() > remaining_capacity) {
         subdata = subdata.substr(0, remaining_capacity);
     }
-
+    
     for(size_t i = 0; i < subdata.length() ; i++){
         if(start_index + i < _capacity){
             _unassembled[start_index + i] = subdata[i];
@@ -70,6 +68,20 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         }
     }
 
+    // //2
+    // if (subdata.size() > remaining_capacity + (_next_index - index)) {
+    //     subdata = subdata.substr(0, remaining_capacity + (_next_index - index));
+    // }
+
+    // for(size_t i = 0; i < subdata.length() ; i++){
+    //     if(index + i < _capacity){
+    //         _unassembled[index + i] = subdata[i];
+    //         _unassembled_bytes++;
+    //     }
+    // }
+
+
+    //debug
     // for(auto i = _unassembled.begin(); i != _unassembled.end(); i++){
     //     cout << i->first << ":" << i->second << endl;
     // }
