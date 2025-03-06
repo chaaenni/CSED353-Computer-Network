@@ -17,7 +17,7 @@ class StreamReassembler {
     map <size_t, char> _unassembled;  //map container for saving unassembled substrings
     size_t _unassembled_bytes; // the number of bytes in the substrings stored but not yet reassembled
     bool _if_eof; //check if eof is reached
-    size_t _next_index; 
+    size_t _next_index; //the expected index of the next substring
 
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
