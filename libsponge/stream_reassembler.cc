@@ -24,10 +24,9 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         
         _if_eof = true;
     }
-    
-    // if(index + data.length() <= _next_index){
-    //     
-    //     return;
+
+    // if(index + data.size() <= _next_index){
+        
     // }
 
     size_t start_index = index;
@@ -36,6 +35,12 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
         start_index = _next_index;
         subdata = data.substr(start_index - index);
     }
+
+    // size_t start_index = index;
+    // string subdata = data;
+    // // if(index < _next_index){
+    // //     subdata = data.substr(_next_index - index);
+    // // }
 
     // for(size_t i = 0; i < subdata.length() ; i++){
     //     _unassembled[start_index + i] = subdata[i];
@@ -51,15 +56,18 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     //     }
     // }
 
-    size_t remaining_capacity = _capacity - _output.buffer_size() - _unassembled_bytes;
-    cout << "_unassembled_bytes: " << _unassembled_bytes << "capacity: " << _capacity << endl;
+    size_t remaining_capacity = _capacity - _output.buffer_size();
+    // size_t remaining_capacity = _capacity - _output.buffer_size() - _unassembled_bytes;
+    // cout << "_unassembled_bytes: " << _unassembled_bytes << "capacity: " << _capacity << endl;
     if (subdata.size() > remaining_capacity) {
         subdata = subdata.substr(0, remaining_capacity);
     }
 
     for(size_t i = 0; i < subdata.length() ; i++){
-        _unassembled[start_index + i] = subdata[i];
-        _unassembled_bytes++;
+        if(start_index + i < _capacity){
+            _unassembled[start_index + i] = subdata[i];
+            _unassembled_bytes++;
+        }
     }
 
     // for(auto i = _unassembled.begin(); i != _unassembled.end(); i++){
@@ -69,22 +77,21 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     
     
     string assembled = "";
-    size_t first_index = _unassembled.begin()->first;
 
-    for(size_t i = first_index; _unassembled.size() != 0; i++){
-        if(i == _next_index){
-            assembled += _unassembled[i];
-            _unassembled.erase(i);
+    for(auto i = _unassembled.begin(); i != _unassembled.end(); ){
+        if(i->first == _next_index){
+            assembled += i->second;
             _next_index++;
             _unassembled_bytes--;
-        }else break;
+            i = _unassembled.erase(i);
+        }else{
+            i++;
+        }
     }
 
-    int bytes = _output.write(assembled);
+    _output.write(assembled);
     // cout << "string: " << _output.peek_output(_output.buffer_size()) << endl;
-    cout << "num_written: " << bytes << endl;
-    // _next_index += assembled_bytes;
-    // _unassembled_bytes -= assembled_bytes;
+    // cout << "num_written: " << bytes << endl;
 
 
 
