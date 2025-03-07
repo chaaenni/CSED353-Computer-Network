@@ -53,6 +53,7 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     // }
 
     size_t remaining_capacity = _capacity - _output.buffer_size();
+    cout << "remaining capacity: " << remaining_capacity << "buffer size: " << endl;
     // size_t remaining_capacity = _capacity - _output.buffer_size() - _unassembled_bytes;
     // cout << "_unassembled_bytes: " << _unassembled_bytes << "capacity: " << _capacity << endl;
 
@@ -62,11 +63,12 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     }
     
     for(size_t i = 0; i < subdata.length() ; i++){
-        if(start_index + i < _capacity){
+        if(_unassembled.size() <= _capacity){
+            if(_unassembled.find(start_index + i) == _unassembled.end()) _unassembled_bytes++;
             _unassembled[start_index + i] = subdata[i];
-            _unassembled_bytes++;
         }
     }
+    // cout << "unassembled siz_before: " << _unassembled_bytes << endl;
 
     // //2
     // if (subdata.size() > remaining_capacity + (_next_index - index)) {
@@ -89,12 +91,14 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     
     
     string assembled = "";
+    size_t assembled_bytes = _output.buffer_size();
 
     for(auto i = _unassembled.begin(); i != _unassembled.end(); ){
-        if(i->first == _next_index){
+        if((i->first == _next_index) && (assembled_bytes < _capacity)){
             assembled += i->second;
             _next_index++;
             _unassembled_bytes--;
+            assembled_bytes++;
             i = _unassembled.erase(i);
         }else{
             i++;
@@ -102,9 +106,13 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     }
 
     _output.write(assembled);
+    cout << "unassembled siz_after: " << _unassembled_bytes << endl;
     // cout << "string: " << _output.peek_output(_output.buffer_size()) << endl;
     // cout << "num_written: " << bytes << endl;
 
+    // for(auto i = _unassembled.begin(); i != _unassembled.end(); i++){
+    //     cout << i->first << ":" << i->second << endl;
+    // }
 
 
     if(_if_eof && _unassembled_bytes == 0) _output.end_input();
