@@ -11,7 +11,7 @@ void DUMMY_CODE(Targs &&... /* unused */) {}
 using namespace std;
 
 void TCPReceiver::segment_received(const TCPSegment &seg) {
-    DUMMY_CODE(seg);
+    if(!_if_syn_set && seg.headerx)
 }
 
 optional<WrappingInt32> TCPReceiver::ackno() const { return {}; }

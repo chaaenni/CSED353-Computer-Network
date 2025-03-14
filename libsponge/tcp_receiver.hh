@@ -20,6 +20,11 @@ class TCPReceiver {
     //! The maximum number of bytes we'll store.
     size_t _capacity;
 
+    WrappingInt32 _isn{0}; //isn
+    bool _if_syn_set = false; //verify whether the SYN flag in the TCP segment has been set for the TCPReceiver
+    bool _if_fin_set = false; //verify whether the FIN flag in the TCP segment has been set for the TCPReceiver
+    size_t abs_checkpoint = 0; //save checkpoint for unwrapping seqno to absolute seqno
+
   public:
     //! \brief Construct a TCP receiver
     //!
