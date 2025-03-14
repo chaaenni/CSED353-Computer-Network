@@ -50,6 +50,9 @@ class StreamReassembler {
     //! \brief Is the internal state empty (other than the output stream)?
     //! \returns `true` if no substrings are waiting to be assembled
     bool empty() const;
+
+    //returns the _next_indexs for tcp_receiver
+    size_t get_next_index() const {return _next_index;}
 };
 
 #endif  // SPONGE_LIBSPONGE_STREAM_REASSEMBLER_HH

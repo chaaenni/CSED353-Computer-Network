@@ -20,17 +20,21 @@ class TCPReceiver {
     //! The maximum number of bytes we'll store.
     size_t _capacity;
 
-    WrappingInt32 _isn{0}; //isn
-    bool _if_syn_set = false; //verify whether the SYN flag in the TCP segment has been set for the TCPReceiver
-    bool _if_fin_set = false; //verify whether the FIN flag in the TCP segment has been set for the TCPReceiver
-    size_t abs_checkpoint = 0; //save checkpoint for unwrapping seqno to absolute seqno
+    WrappingInt32 _isn; //isn
+    bool _if_syn_set; //verify whether the SYN flag in the TCP segment has been set for the TCPReceiver
+    bool _if_fin_set; //verify whether the FIN flag in the TCP segment has been set for the TCPReceiver
+    bool _syn_flag; //save the value of the SYN flag in the TCP segment
+    bool _fin_flag; //save the value of the FIN flag in the TCP segment
+    size_t _abs_checkpoint; //save checkpoint for unwrapping seqno to absolute seqno
 
   public:
     //! \brief Construct a TCP receiver
     //!
     //! \param capacity the maximum number of bytes that the receiver will
     //!                 store in its buffers at any give time.
-    TCPReceiver(const size_t capacity) : _reassembler(capacity), _capacity(capacity) {}
+    TCPReceiver(const size_t capacity) : _reassembler(capacity), _capacity(capacity), _isn{0}, 
+                                          _if_syn_set(false), _if_fin_set(false), _syn_flag(false), _fin_flag(false),
+                                          _abs_checkpoint(0) {}
 
     //! \name Accessors to provide feedback to the remote TCPSender
     //!@{
