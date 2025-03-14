@@ -35,17 +35,17 @@ uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint) {
 
     uint64_t abs_seqno = (n_64 < isn_64) ? n_64 + _2_32_with_64bit - isn_64 : n_64 - isn_64;
 
-    if(abs_seqno >= checkpoint) return abs_seqno;
+    if (abs_seqno >= checkpoint)
+        return abs_seqno;
 
     uint64_t left_dist = (checkpoint - abs_seqno) % _2_32_with_64bit;
     uint64_t right_dist = (abs_seqno - checkpoint) % _2_32_with_64bit;
 
-    if(left_dist > right_dist){
+    if (left_dist > right_dist) {
         abs_seqno = checkpoint + right_dist;
-    }else{
+    } else {
         abs_seqno = checkpoint - left_dist;
     }
 
     return abs_seqno;
-
 }
