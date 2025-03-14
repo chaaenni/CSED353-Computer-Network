@@ -11,16 +11,17 @@ void DUMMY_CODE(Targs &&... /* unused */) {}
 using namespace std;
 
 void TCPReceiver::segment_received(const TCPSegment &seg) {
+    WrappingInt32 seqno = seg.header().seqno;
     _syn_flag = seg.header().syn;
     _fin_flag = seg.header().fin;
-    WrappingInt32 seqno = seg.header().seqno;
 
-    if(!_if_syn_set && _syn_flag){
+    if(!_if_syn_set && _syn_flag){ //initialize ISN when SYN flag is true
         _isn = seqno;
         _if_syn_set = true;
     }
 
     if(!_if_fin_set && _fin_flag){
+        _abs_seqno_fin = unwrap(seqno + seg.length_in_sequence_space() - 1, _isn, _abs_checkpoint);
         _if_fin_set = true;
     }
 
@@ -37,8 +38,9 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
 optional<WrappingInt32> TCPReceiver::ackno() const {
     if(!_if_syn_set) return {};
 
-    size_t ackno = _reassembler.get_next_index() + (_if_syn_set? 1 : 0) + (_if_fin_set? 1 : 0);
-    return wrap(ackno, _isn);
+    size_t ackno = _reassembler.get_next_index() + (_if_syn_set? 1 : 0); //if SYN flag is already set in TCP receiver, then add 1(for including SYN index)
+    ackno += (ackno == _abs_seqno_fin ? 1 : 0); //if ackno is equal to absolute seqno of the FIN, then increment ackno by 1.
+    return wrap(ackno, _isn); //convert to WrapingInt32(seqno style)
 }
 
 size_t TCPReceiver::window_size() const { return _capacity - _reassembler.stream_out().buffer_size(); }
