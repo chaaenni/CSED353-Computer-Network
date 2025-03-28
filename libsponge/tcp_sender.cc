@@ -26,7 +26,7 @@ TCPSender::TCPSender(const size_t capacity, const uint16_t retx_timeout, const s
     , _is_fin_set(false)
     , _consecutive_retransmissions(0)
     , _recent_abs_ackno(0)
-    , _window_size(0)
+    , _window_size(1)
     , _is_window_size_0(false)
     , _RTO(_initial_retransmission_timeout)
     , _timer() {}
@@ -80,7 +80,8 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
     uint64_t abs_seqno = unwrap(segment.header().seqno, _isn, _recent_abs_ackno);
 
     while(!_outstanding_segments.empty() &&
-    abs_ackno >= abs_seqno + segment.length_in_sequence_space()){
+    abs_ackno >= abs_seqno + segment.length_in_sequence_space() &&
+    abs_ackno <= _next_seqno){
         _outstanding_segments.pop();
         _bytes_in_flight -= segment.length_in_sequence_space();
 

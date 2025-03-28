@@ -13,8 +13,8 @@
 
 class Timer {
   private:
-    unsigned int _elapsed_time;
-    bool _if_run;
+    unsigned int _elapsed_time; //for saving elapsed time of the timer
+    bool _if_run; //if timer is running now
 
   public:
     Timer();
@@ -46,19 +46,19 @@ class TCPSender {
     //! the (absolute) sequence number for the next byte to be sent
     uint64_t _next_seqno{0};
 
-    std::queue<TCPSegment> _outstanding_segments{};
-    uint64_t _bytes_in_flight{0};
+    std::queue<TCPSegment> _outstanding_segments{}; //queue for storing outstanding segments, that are sent but not acknowledged yet
+    uint64_t _bytes_in_flight{0}; //for saving the number of bytes that are sent but not acknowledged yet
 
-    bool _is_syn_set;
-    bool _is_fin_set;
+    bool _is_syn_set; //if SYN flag has been set
+    bool _is_fin_set; //if FIN flag has been set
 
-    unsigned int _consecutive_retransmissions;
-    uint64_t _recent_abs_ackno;
-    uint16_t _window_size;
-    bool _is_window_size_0;
-    unsigned int _RTO;
+    unsigned int _consecutive_retransmissions; //for saving the number of consecutive retransmissions
+    uint64_t _recent_abs_ackno; //for saving recent absolute ackno 
+    uint16_t _window_size; //for saving the window size received from the receiver, especially for fill_window()
+    bool _is_window_size_0; //if window size received from the receiver is 0
+    unsigned int _RTO; //retransmission timeout. Initialized with _initial_retransmission_timeout, and doubled when timer has been expired
 
-    Timer _timer;
+    Timer _timer; //additionally defined class for controlling timer and elapsed time
 
   public:
     //! Initialize a TCPSender
