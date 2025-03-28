@@ -15,6 +15,7 @@ If you used any part of best-submission codes, specify all the best-submission n
 
 Program Structure and Design of the TCPSender:
 [
+
     ##1. TCPSender
 
     For the TCPSender class, I added the following private members:
@@ -77,6 +78,7 @@ Program Structure and Design of the TCPSender:
 
 Implementation Challenges:
 [
+
     - I failed the t_send_ack test case because I did not handle the case where the received ackno from the receiver is greater than _next_seqno. To fix this, I added the condition abs_ackno <= _next_seqno to the while loop in the ack_received function. This ensures the code only runs when the condition is met.
 
     - I encountered a segmentation fault in the t_send_extra test case, and finding the cause took a long time. I suspected that the while loop structure in the ack_received function could cause the segmentation fault. I modified the loop structure to avoid segmentation faults by using the condition !_outstanding_segments.empty(). If this condition is met, I calculate segment and abs_seqno, and break the loop if abs_ackno < abs_seqno + segment.length_in_sequence_space() or abs_ackno > _next_seqno. This made the code safer, and I was able to pass the test case.
@@ -84,5 +86,7 @@ Implementation Challenges:
 
 Remaining Bugs:
 [
+
     As far a I know, there’re no remaining bugs in my code.
+    
 ]
