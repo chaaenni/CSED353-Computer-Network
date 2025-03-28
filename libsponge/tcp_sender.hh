@@ -11,6 +11,20 @@
 
 //! \brief The "sender" part of a TCP implementation.
 
+class Timer {
+  private:
+    unsigned int _elapsed_time;
+    bool _if_run;
+
+  public:
+    Timer();
+    void stop();
+    void start();
+    void increment(const size_t ms_since_last_tick);
+    unsigned int elapsed_time();
+    bool if_run();
+};
+
 //! Accepts a ByteStream, divides it up into segments and sends the
 //! segments, keeps track of which segments are still in-flight,
 //! maintains the Retransmission Timer, and retransmits in-flight
@@ -31,6 +45,20 @@ class TCPSender {
 
     //! the (absolute) sequence number for the next byte to be sent
     uint64_t _next_seqno{0};
+
+    std::queue<TCPSegment> _outstanding_segments{};
+    uint64_t _bytes_in_flight{0};
+
+    bool _is_syn_set;
+    bool _is_fin_set;
+
+    unsigned int _consecutive_retransmissions;
+    uint64_t _recent_abs_ackno;
+    uint16_t _window_size;
+    bool _is_window_size_0;
+    unsigned int _RTO;
+
+    Timer _timer;
 
   public:
     //! Initialize a TCPSender
