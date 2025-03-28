@@ -100,7 +100,7 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
 void TCPSender::tick(const size_t ms_since_last_tick) {
     if(!_timer.if_run()) return;
 
-    _timer.increment(ms_since_last_tick);
+    _timer.increment(ms_since_last_tick); // increment the elapsed_time in the timer
 
     if(_timer.elapsed_time() >= _RTO){ // if timer has been expired
         TCPSegment earliest_segment = _outstanding_segments.front();
