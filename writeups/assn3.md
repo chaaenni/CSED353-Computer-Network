@@ -16,7 +16,7 @@ If you used any part of best-submission codes, specify all the best-submission n
 Program Structure and Design of the TCPSender:
 [
 
-    <h2>1. TCPSender</h2>
+    1. TCPSender
 
     For the TCPSender class, I added the following private members:
     - outstanding_segments: queue for storing outstanding segments, that are sent but not acknowledged yet
@@ -30,10 +30,10 @@ Program Structure and Design of the TCPSender:
     - unsigned int _RTO: retransmission timeout. Initialized with _initial_retransmission_timeout, and doubled when timer has been expired
     - Timer _timer: additionally defined class for controlling timer and elapsed time
 
-    ###(1). fill_window()
+    (1). fill_window()
     - While the condition that SYN hasn't been set yet or next_seqno is smaller than recent_abs_ackno + window_size is satisfied, create a segment and set its header and payload with the appropriate seqno and strings read from the stream, respectively. Then, put the segment into both the segments_out buffer and the outstanding_segments buffer. Also, update bytes_in_flight and next_seqno by adding the length in the sequence space of the TCP segment, and start the timer if it is not already running.
 
-    ###(2). ack_received()
+    (2). ack_received()
     - First of all, preprocess the window size received from the receiver and calculate the absolute ackno using the given ackno from the receiver. Then, while the outstanding_segments buffer is not empty, iterate the following process:
 
         - Get the frontmost segment from the outstanding_segments buffer and calculate the absolute seqno of the segment.
@@ -43,34 +43,34 @@ Program Structure and Design of the TCPSender:
 
     - Set recent_abs_ackno as the calculated absolute ackno, and if the outstanding_segments buffer is empty, stop the timer.
 
-    ###(3). tick()
+    (3). tick()
     - If the timer is not running, return from the function.
     - Add ms_since_last_tick, which is the input of the function, to the elapsed time of the timer.
     - If the timer has expired, resend the frontmost TCPSegment from the outstanding_segments buffer. If the window_size is nonzero, increment consecutive_retransmissions and double the RTO.
     - Restart the timer.
 
-    ###(4). send_empty_segment()
+    (4). send_empty_segment()
     - Create the TCPSegment with empty payload and set its seqno with next_seqno.
     - Push it to the segments_out buffer.
 
 
-    ###(5). consecutive_retransmissions() and bytes_in_flight()
+    (5). consecutive_retransmissions() and bytes_in_flight()
     - Each returns _consecutive_retransmissions and _bytes_in_flight.
 
 
-    ##2. Timer
+    2. Timer
     I newly added the Timer class to manage time-related factors. For the Timer class, I added the following private members:
     - unsigned int _elapsed_time: for saving elapsed time of the timer
     - bool _if_run: if timer is running now
 
-    ###(1). stop() and start()
+    (1). stop() and start()
     - stop() sets if_run false, and reset elapsed_time as 0.
     - start() sets if_run true, and reset elapsed_time as 0.
 
-    ###(2). increment()
+    (2). increment()
     - increment() adds ms_since_last_tick to elapsed_time if the timer is running. 
 
-    ###(3). elapsed_time() and if_run()
+    (3). elapsed_time() and if_run()
     - Each function returns _elapsed_time and _if_run.
 
 
