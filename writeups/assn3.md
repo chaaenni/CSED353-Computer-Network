@@ -16,7 +16,7 @@ If you used any part of best-submission codes, specify all the best-submission n
 Program Structure and Design of the TCPSender:
 [
 
-    ##1. TCPSender
+    <h2>[1. TCPSender]</h2>
 
     For the TCPSender class, I added the following private members:
     - outstanding_segments: queue for storing outstanding segments, that are sent but not acknowledged yet
