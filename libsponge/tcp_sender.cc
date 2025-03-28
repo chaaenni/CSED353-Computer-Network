@@ -58,9 +58,6 @@ void TCPSender::fill_window() {
 
         if(!_timer.if_run()) _timer.start();
     }
-
-    return;
-
 }
 
 
@@ -72,28 +69,25 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
         _window_size = 1;
         _is_window_size_0 = true;
     }
-    else _window_size = max(window_size, uint16_t(1));
+    else _window_size = window_size;
 
     uint64_t abs_ackno = unwrap(ackno, _isn, _recent_abs_ackno);
 
-    TCPSegment segment = _outstanding_segments.front();
-    uint64_t abs_seqno = unwrap(segment.header().seqno, _isn, _recent_abs_ackno);
+    while(!_outstanding_segments.empty()){
+        TCPSegment segment = _outstanding_segments.front();
+        uint64_t abs_seqno = unwrap(segment.header().seqno, _isn, _recent_abs_ackno);
 
-    while(!_outstanding_segments.empty() &&
-    abs_ackno >= abs_seqno + segment.length_in_sequence_space() &&
-    abs_ackno <= _next_seqno){
-        _outstanding_segments.pop();
-        _bytes_in_flight -= segment.length_in_sequence_space();
+        if(abs_ackno < abs_seqno + segment.length_in_sequence_space() ||
+        abs_ackno > _next_seqno) break;
+        else{
+            _outstanding_segments.pop();
+            _bytes_in_flight -= segment.length_in_sequence_space();
 
-        //update timer-related factors and the number of consecutive_retransmissions
-        _RTO = _initial_retransmission_timeout;
-        _consecutive_retransmissions = 0;
+            //update timer-related factors and the number of consecutive_retransmissions
+            _RTO = _initial_retransmission_timeout;
+            _consecutive_retransmissions = 0;
 
-        _timer.start();
-
-        if(!_outstanding_segments.empty()){
-            segment = _outstanding_segments.front();
-            abs_seqno = unwrap(segment.header().seqno, _isn, _recent_abs_ackno);
+            _timer.start();
         }
     }
 
