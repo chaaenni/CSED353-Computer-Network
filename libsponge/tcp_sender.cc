@@ -128,6 +128,12 @@ void TCPSender::send_empty_segment() {
     _segments_out.push(segment);
 }
 
+bool TCPSender::is_syn_sent() const {return _is_syn_set; }
+
+bool TCPSender::is_fin_acked() const { return _is_fin_set && (_next_seqno == _recent_abs_ackno); }
+
+bool TCPSender::is_fin_sent() const { return _is_fin_set; }
+
 Timer::Timer() : _elapsed_time(0), _if_run(false) {}
 
 void Timer::stop() {

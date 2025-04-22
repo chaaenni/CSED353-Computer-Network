@@ -21,6 +21,12 @@ class TCPConnection {
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
     bool _linger_after_streams_finish{true};
 
+    bool _active{true}; //indicate the status of the connection - whether the connection is active or not
+    size_t _time_since_last_segment_received{0}; //save the elapsed time since the last segment is received
+
+    void send_segments(); //private function for sending segements kept in outbound's sending queue
+
+
   public:
     //! \name "Input" interface for the writer
     //!@{
