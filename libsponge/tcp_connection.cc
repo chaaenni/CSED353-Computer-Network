@@ -47,7 +47,7 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
         _sender.send_empty_segment();
     }
 
-    if(!_sender.is_fin_sent() && _receiver.stream_out().input_ended()){
+    if(!_sender.is_fin_sent() && _receiver.stream_out().input_ended()){ //!_sender.is_fin_sent()
         _linger_after_streams_finish = false;
     }
 
@@ -71,7 +71,7 @@ size_t TCPConnection::write(const string &data) {
 void TCPConnection::tick(const size_t ms_since_last_tick) {
     _time_since_last_segment_received += ms_since_last_tick;
     _sender.tick(ms_since_last_tick);
-    
+
     if(_sender.consecutive_retransmissions() > _cfg.MAX_RETX_ATTEMPTS){
         //do unclean shutdown
         _sender.stream_in().set_error();

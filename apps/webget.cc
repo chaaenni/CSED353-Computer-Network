@@ -1,4 +1,4 @@
-#include "socket.hh"
+#include "tcp_sponge_socket.hh"
 #include "util.hh"
 
 #include <cstdlib>
@@ -17,7 +17,7 @@ void get_URL(const string &host, const string &path) {
     // the "eof" (end of file).
 
     try {
-        TCPSocket socket;
+        CS144TCPSocket socket;
         socket.connect(Address(host, "http"));
 
         string req = "GET " + path + " " +
@@ -37,6 +37,8 @@ void get_URL(const string &host, const string &path) {
         }
 
         socket.close();
+
+        socket.wait_until_closed();
     } catch (const exception &e) {
         cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
         cerr << "Warning: get_URL() has not been implemented yet.\n";

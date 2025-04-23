@@ -8,6 +8,8 @@
 template <typename... Targs>
 void DUMMY_CODE(Targs &&... /* unused */) {}
 
+#include <iostream>
+
 using namespace std;
 
 void TCPReceiver::segment_received(const TCPSegment &seg) {
@@ -28,7 +30,10 @@ void TCPReceiver::segment_received(const TCPSegment &seg) {
     if (!seg.length_in_sequence_space() || !_if_syn_set)
         return;  // if the length of the TCP segment is 0 or SYN has not arrived, then just return the function
 
+
     uint64_t abs_seqno = unwrap(seqno, _isn, _abs_checkpoint);
+
+    // cout << "abs_seqno: " << abs_seqno << endl;
     size_t stream_index =
         (!_syn_flag) ? abs_seqno - 1 : abs_seqno;  // if SYN flag is false(if segment is not SYN and just ordinary
                                                    // segment), get stream_index by calculating abs_seqno - 1
