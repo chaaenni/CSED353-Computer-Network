@@ -27,23 +27,25 @@ void StreamReassembler::push_substring(const string &data, const size_t index, c
     // cout << "capacity: " << _capacity << endl;
     // preprocess the input data(slice the data to insert only neccessary part into the unassembled map)
     size_t start_index = index;
-    size_t remaining_capacity = _capacity - _output.buffer_size(); //remaining capacity of the _output buffer(reassembled buffer)
-    //next_index represents the index right after the index of the last reassembled packet
-    size_t right_end_window = _next_index + remaining_capacity; //get the index of right side of the window
+    size_t remaining_capacity =
+        _capacity - _output.buffer_size();  // remaining capacity of the _output buffer(reassembled buffer)
+    // next_index represents the index right after the index of the last reassembled packet
+    size_t right_end_window = _next_index + remaining_capacity;  // get the index of right side of the window
     string subdata = data;
 
-    //slice the front part of the input data(if index is smaller than next index, then slice)
+    // slice the front part of the input data(if index is smaller than next index, then slice)
     if (index < _next_index) {
         start_index = _next_index;
         if (subdata.size() > start_index - index)
             subdata = data.substr(start_index - index);
         else
             subdata = "";
-    }else{ //if the input index is larger than _next_index and also larger than right_end_window
-        if(start_index >= right_end_window) subdata = ""; //index >= UINT64_MAX || 
+    } else {  // if the input index is larger than _next_index and also larger than right_end_window
+        if (start_index >= right_end_window)
+            subdata = "";  // index >= UINT64_MAX ||
     }
 
-    //slice the back part of the input data(if the size of the subdata is larger than remaining capacity, then slice)
+    // slice the back part of the input data(if the size of the subdata is larger than remaining capacity, then slice)
     if (subdata.size() > remaining_capacity) {
         subdata = subdata.substr(0, remaining_capacity);
     }

@@ -118,9 +118,9 @@ class TCPSender {
     WrappingInt32 next_seqno() const { return wrap(_next_seqno, _isn); }
     //!@}
 
-    bool is_syn_sent() const; // return whether the SYN segment has been sent
-    bool is_fin_sent() const; // return whether the FIN segment has been sent
-    bool is_fin_acked() const; // return whether the FIN segment has been sent and acknowlegded
+    bool is_syn_sent() const;   // return whether the SYN segment has been sent
+    bool is_fin_sent() const;   // return whether the FIN segment has been sent
+    bool is_fin_acked() const;  // return whether the FIN segment has been sent and acknowlegded
 };
 
 #endif  // SPONGE_LIBSPONGE_TCP_SENDER_HH
