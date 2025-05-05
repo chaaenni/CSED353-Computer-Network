@@ -17,7 +17,7 @@ void get_URL(const string &host, const string &path) {
     // the "eof" (end of file).
 
     try {
-        CS144TCPSocket socket;
+        FullStackSocket socket;
         socket.connect(Address(host, "http"));
 
         string req = "GET " + path + " " +

@@ -33,14 +33,102 @@ void NetworkInterface::send_datagram(const InternetDatagram &dgram, const Addres
     // convert IP address of next hop to raw 32-bit representation (used in ARP header)
     const uint32_t next_hop_ip = next_hop.ipv4_numeric();
 
-    DUMMY_CODE(dgram, next_hop, next_hop_ip);
+    //if matched ethernet address is equal to EHTERNET_BROADCAST(if the address is still waiting for the ARP reply for less than 5 seconds), 
+    //don't send a second ARP request - just wait for a reply to the first one(just return!)
+    if(_mapping_cache.find(next_hop_ip) != _mapping_cache.end() && _mapping_cache.find(next_hop_ip)->second.first == ETHERNET_BROADCAST){
+        return;
+    }
+
+    //if the destination Ethernet address is already known(IPv4)
+    if(_mapping_cache.find(next_hop_ip) != _mapping_cache.end()){
+        EthernetFrame frame;
+        frame.payload().append(dgram.serialize());
+        frame.header().src = _ethernet_address;
+        frame.header().dst = _mapping_cache[next_hop_ip].first;
+        frame.header().type = EthernetHeader::TYPE_IPv4;
+
+        _frames_out.push(frame);
+    }else{ //if the destination Ethernet address is unknown(ARP)
+        // convert IP address of the current interface(src) to raw 32-bit representation
+        const uint32_t src_ip = _ip_address.ipv4_numeric();
+
+        ARPMessage arp_message;
+        arp_message.sender_ip_address = src_ip;
+        arp_message.sender_ethernet_address = _ethernet_address;
+        arp_message.target_ip_address = next_hop_ip;
+
+        EthernetFrame frame;
+        frame.payload().append(arp_message.serialize());
+        frame.header().src = _ethernet_address;
+        frame.header().dst = ETHERNET_BROADCAST;
+        frame.header().type = EthernetHeader::TYPE_ARP;
+
+        _frames_out.push(frame);
+        _ARP_queue.push_back({dgram, next_hop});
+
+        _mapping_cache[next_hop_ip] = {ETHERNET_BROADCAST, 0}; //set mapped ethernet address to ETHERNET_BROADCAST
+        //so that it can be identified that the ip address hasn't received corresponding ARP reply(corresponding ethernet address)
+    }
+    
 }
 
 //! \param[in] frame the incoming Ethernet frame
 optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &frame) {
-    DUMMY_CODE(frame);
-    return {};
+    if(frame.header().dst != ETHERNET_BROADCAST || frame.header().dst != _ethernet_address) return nullopt;
+    if(frame.header().type == EthernetHeader::TYPE_IPv4){
+        InternetDatagram datagram;
+        if(datagram.parse(frame.payload()) == ParseResult::NoError){
+            return datagram;
+        }
+    }
+
+    else if(frame.header().type == EthernetHeader::TYPE_ARP){
+        ARPMessage arp_message;
+        if(arp_message.parse(frame.payload()) == ParseResult::NoError){
+            _mapping_cache[arp_message.sender_ip_address] = {arp_message.sender_ethernet_address, 0};
+
+            if(arp_message.opcode == arp_message.OPCODE_REQUEST){
+                ARPMessage arp_reply;
+                arp_reply.sender_ip_address = _ip_address.ipv4_numeric();
+                arp_reply.sender_ethernet_address = _ethernet_address;
+                arp_reply.target_ip_address = arp_message.sender_ip_address;
+                arp_reply.target_ethernet_address = arp_message.sender_ethernet_address;
+                arp_reply.opcode = arp_reply.OPCODE_REPLY;
+
+                EthernetFrame frame_reply;
+                frame_reply.payload().append(arp_reply.serialize());
+                frame_reply.header().src = _ethernet_address;
+                frame_reply.header().dst = arp_reply.target_ethernet_address;
+                frame_reply.header().type = EthernetHeader::TYPE_ARP;
+
+                _frames_out.push(frame_reply);
+            }
+            else if(arp_message.opcode == arp_message.OPCODE_REPLY){
+                for(auto i = _ARP_queue.cbegin(); i != _ARP_queue.cend();){
+                    if(i->second.ipv4_numeric() == arp_message.sender_ip_address){
+                        send_datagram(i->first, i->second);
+                        i = _ARP_queue.erase(i);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return nullopt;
 }
 
 //! \param[in] ms_since_last_tick the number of milliseconds since the last call to this method
-void NetworkInterface::tick(const size_t ms_since_last_tick) { DUMMY_CODE(ms_since_last_tick); }
+void NetworkInterface::tick(const size_t ms_since_last_tick) {
+    for(auto i = _mapping_cache.begin(); i != _mapping_cache.end(); ){
+        i->second.second += ms_since_last_tick;
+        if(i->second.first == ETHERNET_BROADCAST){
+            if(i->second.second >= 5000) i = _mapping_cache.erase(i);
+            else i++;
+        }
+        else{
+            if(i->second.second >= 30000) i =_mapping_cache.erase(i);
+            else i++;
+        }
+    }
+}
