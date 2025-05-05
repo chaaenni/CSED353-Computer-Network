@@ -56,6 +56,7 @@ void NetworkInterface::send_datagram(const InternetDatagram &dgram, const Addres
         arp_message.sender_ip_address = src_ip;
         arp_message.sender_ethernet_address = _ethernet_address;
         arp_message.target_ip_address = next_hop_ip;
+        arp_message.opcode = arp_message.OPCODE_REQUEST;
 
         EthernetFrame frame;
         frame.payload().append(arp_message.serialize());
@@ -74,7 +75,8 @@ void NetworkInterface::send_datagram(const InternetDatagram &dgram, const Addres
 
 //! \param[in] frame the incoming Ethernet frame
 optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &frame) {
-    if(frame.header().dst != ETHERNET_BROADCAST || frame.header().dst != _ethernet_address) return nullopt;
+    if(frame.header().dst != ETHERNET_BROADCAST && frame.header().dst != _ethernet_address) return nullopt;
+    
     if(frame.header().type == EthernetHeader::TYPE_IPv4){
         InternetDatagram datagram;
         if(datagram.parse(frame.payload()) == ParseResult::NoError){
@@ -88,21 +90,24 @@ optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &fra
             _mapping_cache[arp_message.sender_ip_address] = {arp_message.sender_ethernet_address, 0};
 
             if(arp_message.opcode == arp_message.OPCODE_REQUEST){
-                ARPMessage arp_reply;
-                arp_reply.sender_ip_address = _ip_address.ipv4_numeric();
-                arp_reply.sender_ethernet_address = _ethernet_address;
-                arp_reply.target_ip_address = arp_message.sender_ip_address;
-                arp_reply.target_ethernet_address = arp_message.sender_ethernet_address;
-                arp_reply.opcode = arp_reply.OPCODE_REPLY;
+                if(_ip_address.ipv4_numeric() == arp_message.target_ip_address){
+                    ARPMessage arp_reply;
+                    arp_reply.sender_ip_address = _ip_address.ipv4_numeric();
+                    arp_reply.sender_ethernet_address = _ethernet_address;
+                    arp_reply.target_ip_address = arp_message.sender_ip_address;
+                    arp_reply.target_ethernet_address = arp_message.sender_ethernet_address;
+                    arp_reply.opcode = arp_reply.OPCODE_REPLY;
 
-                EthernetFrame frame_reply;
-                frame_reply.payload().append(arp_reply.serialize());
-                frame_reply.header().src = _ethernet_address;
-                frame_reply.header().dst = arp_reply.target_ethernet_address;
-                frame_reply.header().type = EthernetHeader::TYPE_ARP;
+                    EthernetFrame frame_reply;
+                    frame_reply.payload().append(arp_reply.serialize());
+                    frame_reply.header().src = _ethernet_address;
+                    frame_reply.header().dst = arp_reply.target_ethernet_address;
+                    frame_reply.header().type = EthernetHeader::TYPE_ARP;
 
-                _frames_out.push(frame_reply);
+                    _frames_out.push(frame_reply);
+                }
             }
+            
             else if(arp_message.opcode == arp_message.OPCODE_REPLY){
                 for(auto i = _ARP_queue.cbegin(); i != _ARP_queue.cend();){
                     if(i->second.ipv4_numeric() == arp_message.sender_ip_address){
@@ -110,6 +115,7 @@ optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &fra
                         i = _ARP_queue.erase(i);
                         break;
                     }
+                    else i++;
                 }
             }
         }
