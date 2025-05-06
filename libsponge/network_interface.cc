@@ -77,19 +77,19 @@ void NetworkInterface::send_datagram(const InternetDatagram &dgram, const Addres
 optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &frame) {
     if(frame.header().dst != ETHERNET_BROADCAST && frame.header().dst != _ethernet_address) return nullopt;
     
-    if(frame.header().type == EthernetHeader::TYPE_IPv4){
+    if(frame.header().type == EthernetHeader::TYPE_IPv4){ //if the inbound frame is IPv4, parse the payload as an InternetDatagram
         InternetDatagram datagram;
         if(datagram.parse(frame.payload()) == ParseResult::NoError){
             return datagram;
         }
     }
 
-    else if(frame.header().type == EthernetHeader::TYPE_ARP){
+    else if(frame.header().type == EthernetHeader::TYPE_ARP){ //if the inbound frame is ARP, parse the payload as an ARPMessage
         ARPMessage arp_message;
         if(arp_message.parse(frame.payload()) == ParseResult::NoError){
             _mapping_cache[arp_message.sender_ip_address] = {arp_message.sender_ethernet_address, 0};
 
-            if(arp_message.opcode == arp_message.OPCODE_REQUEST){
+            if(arp_message.opcode == arp_message.OPCODE_REQUEST){ //if it's an ARP request, send an appropriate ARP reply
                 if(_ip_address.ipv4_numeric() == arp_message.target_ip_address){
                     ARPMessage arp_reply;
                     arp_reply.sender_ip_address = _ip_address.ipv4_numeric();
@@ -108,7 +108,7 @@ optional<InternetDatagram> NetworkInterface::recv_frame(const EthernetFrame &fra
                 }
             }
             
-            else if(arp_message.opcode == arp_message.OPCODE_REPLY){
+            else if(arp_message.opcode == arp_message.OPCODE_REPLY){ //if it's an ARP reply, pop the pending InternetDatagram from _ARP_queue and send it to the target address
                 for(auto i = _ARP_queue.cbegin(); i != _ARP_queue.cend();){
                     if(i->second.ipv4_numeric() == arp_message.sender_ip_address){
                         send_datagram(i->first, i->second);
@@ -132,7 +132,7 @@ void NetworkInterface::tick(const size_t ms_since_last_tick) {
             if(i->second.second >= 5000) i = _mapping_cache.erase(i);
             else i++;
         }
-        else{
+        else{ //remember the mapping between the sender's IP address and Ethernet address for 30 seconds
             if(i->second.second >= 30000) i =_mapping_cache.erase(i);
             else i++;
         }
