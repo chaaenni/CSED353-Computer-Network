@@ -1,17 +1,13 @@
 Assignment 5 Writeup
 =============
 
-My name: [your name here]
+My name: [Chaeyeon Jang]
 
-My POVIS ID: [your povis id here]
+My POVIS ID: [jcy2749]
 
-My student ID (numeric): [your student id here]
+My student ID (numeric): [20200952]
 
-This assignment took me about [n] hours to do (including the time on studying, designing, and writing the code).
-
-If you used any part of best-submission codes, specify all the best-submission numbers that you used (e.g., 1, 2): []
-
-- **Caution**: If you have no idea about above best-submission item, please refer the Assignment PDF for detailed description.
+This assignment took me about [7] hours to do (including the time on studying, designing, and writing the code).
 
 Program Structure and Design of the NetworkInterface:
 []
@@ -20,12 +16,8 @@ Implementation Challenges:
 []
 
 Remaining Bugs:
-[]
+[
 
-- Optional: I had unexpected difficulty with: [describe]
+    As far a I know, there’re no remaining bugs in my code.
 
-- Optional: I think you could make this assignment better by: [describe]
-
-- Optional: I was surprised by: [describe]
-
-- Optional: I'm not sure about: [describe]
+]
