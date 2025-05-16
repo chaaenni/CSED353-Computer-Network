@@ -42,7 +42,8 @@ Program Structure and Design of the Router:
 Implementation Challenges:
 [
 
-    - The most tricky part was implementing the code that checks whether the most significant prefix_length bits of the datagram's destination address match those of the route prefix. In other words, it was tricky to implement the process of finding the routes that match the datagram's destination address, and I had to think carefully about how to create the appropriate mask.
+    - The most tricky part was implementing the code that checks whether the most significant prefix_length bits of the datagram's destination address match those of the route prefix. 
+    - In other words, it was tricky to implement the process of finding the routes that match the datagram's destination address, and I had to think carefully about how to create the appropriate mask.
 
 ]
 
