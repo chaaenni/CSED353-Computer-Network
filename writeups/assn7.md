@@ -15,28 +15,28 @@ My assignment partner's ID (numeric): [20190350]
 
 This assignment took me about [1] hours to do (including the time on studying, designing, and writing the code).
 
-Solo portion:
+
+##Solo portion:
 - My implementation successfully started and ended a conversation with another copy of itself. 
     - the image below shows the conversation between client and server.
         ![solo_conversation](./solo1.png)
 - My implementation successfully transfered a one-megabyte file, named test.txt, with contents identical upon receipt.
-    - By executing the command below, I verified that test.txt that sender sent and test-received.txt that receiver received has same SHA-256 hashes/
-        [
+    - By executing the command below, I verified that test.txt that sender sent and test-received.txt that receiver received has same SHA-256 hashes.
+        ```bash
+        sha256sum /tmp/test.txt
+        ```
 
-            sha256sum /tmp/test.txt
-
-        ]
-        [
-
-            sha256sum /tmp/test-received.txt
-
-        ]
+        ```bash
+        sha256sum /tmp/test-received.txt
+        ```
+        
     - Both test.txt and test-received.txt files have aa69e8d62d009545651cf4d9f72ea615231bb33644e8b3204b60b29b373b0d73 hash.
     - the image below shows the file transfer between client and server.
         ![solo_transfer](./solo2.png)
 - No codes have been changed in the assignment 7.
 
-Group portion:
+
+##Group portion:
 - Our team name is Kahn.
 - My implementations successfully started and ended a conversation with the implementations of my teammates.
     - My implementations successfully acted as client.
