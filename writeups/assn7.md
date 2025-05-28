@@ -38,7 +38,8 @@ This assignment took me about [1] hours to do (including the time on studying, d
 
 
 ## Group portion:
-- Our team name is Kahn.
+- Our team name is Kahn. 
+- My teammate is Jeongmin Oh, with POVIS ID ojm010130.
 - My implementations successfully started and ended a conversation with the implementations of my teammates.
     - My implementations successfully acted as client.
     - My implementations successfully acted as server.
