@@ -16,7 +16,7 @@ My assignment partner's ID (numeric): [20190350]
 This assignment took me about [1] hours to do (including the time on studying, designing, and writing the code).
 
 
-##Solo portion:
+## Solo portion:
 - My implementation successfully started and ended a conversation with another copy of itself. 
     - the image below shows the conversation between client and server.
         ![solo_conversation](./solo1.png)
@@ -36,7 +36,8 @@ This assignment took me about [1] hours to do (including the time on studying, d
 - No codes have been changed in the assignment 7.
 
 
-##Group portion:
+
+## Group portion:
 - Our team name is Kahn.
 - My implementations successfully started and ended a conversation with the implementations of my teammates.
     - My implementations successfully acted as client.
